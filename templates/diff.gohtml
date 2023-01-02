@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diff</title>
+<link rel="stylesheet" href="../../style.css">
+<script src="../../vs/loader.js"></script>
+</head>
+<body>
+<div class="diff"></div>
+<script>
+require.config({ paths: { vs: '../../vs' } });
+
+require(['vs/editor/editor.main'], function () {
+    var diffEditor = monaco.editor.createDiffEditor(document.querySelector('.diff'), {
+        enableSplitViewResizing: false,
+        renderSideBySide: true,
+        readOnly: true,
+        automaticLayout: true,
+        scrollBeyondLastLine: false,
+        minimap: {
+            enabled: false
+        }
+    });
+
+    fetch(`/versions/?tag1={{ .Tag1 }}&tag2={{ .Tag2 }}&file={{ .File }}`)
+        .then(response => response.json())
+        .then(json => {
+            diffEditor.setModel({
+                original: monaco.editor.createModel(json.content1, 'php'),
+                modified: monaco.editor.createModel(json.content2, 'php')
+            });
+        });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparison</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <div class="tags">
+        <select name="from" onchange="loadFiles()">
+        {{ range .Tags }}
+            <option>{{ . }}</option>
+        {{ end }}
+        </select>
+        →
+        <select name="to" onchange="loadFiles()">
+            {{ range .Tags }}
+                <option>{{ . }}</option>
+            {{ end }}
+        </select>
+    </div>
+    <div class="content">
+        <iframe id="files"></iframe>
+        <iframe id="diff"></iframe>
+    </div>
+</div>
+<script>
+function loadFiles() {
+    var from = document.querySelector('select[name="from"]').value;
+    var to = document.querySelector('select[name="to"]').value;
+    var files = document.getElementById('files');
+    files.src = '/files/' + from + '/' + to;
+}
+function loadDiff(customEvent) {
+    var diff = document.getElementById('diff');
+    diff.src = '/diff?tag1=' + customEvent.detail.tag1 + '&tag2=' + customEvent.detail.tag2 + '&file=' + customEvent.detail.file;
+}
+window.document.addEventListener('loadDiff', loadDiff, false)
+</script>
+</body>
+</html>

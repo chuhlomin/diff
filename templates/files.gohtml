@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Files</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+{{ range .Files }}
+{{- if eq .OldHash "" }}
+<a class="file new" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
+{{- else if eq .NewHash "" }}
+<a class="file deleted" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
+{{- else }}
+<a class="file modified" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
+{{- end }}
+{{ end }}
+<script>
+function load(tag1, tag2, file) {
+    window.parent.document.dispatchEvent(new CustomEvent('loadDiff', {
+        detail: {
+            tag1: tag1,
+            tag2: tag2,
+            file: file
+        }
+    }));
+    // prevent default link behavior
+    return false;
+}
+</script>
+</body>
+</html>
