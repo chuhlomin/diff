@@ -97,7 +97,7 @@ iframe + iframe {
 }
 
 .file.deleted {
-  background-color: #ffeef0;
+  text-decoration: line-through;
 }
 
 .file.renamed {
@@ -110,10 +110,6 @@ iframe + iframe {
 
 .file.new:hover {
   background-color: #c6e2d3;
-}
-
-.file.deleted:hover {
-  background-color: #ffdce0;
 }
 
 .diff {
