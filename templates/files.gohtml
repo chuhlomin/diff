@@ -7,22 +7,25 @@
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
-{{ range .Files }}
-{{- if eq .OldHash "" }}
-<a class="file new" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
-{{- else if eq .NewHash "" }}
+{{ range .Changes }}
+{{- if eq .ChangeType "R" }}
+<a class="file renamed" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}', '{{ .OldName }}')" data-file="{{ .OldName }} → {{ .Name }}" title="{{ .OldName }} → {{ .Name }}">{{ .OldName }} → {{ .Name }}</a>
+{{- else if eq .ChangeType "D" }}
 <a class="file deleted" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
+{{- else if eq .ChangeType "A" }}
+<a class="file new" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
 {{- else }}
 <a class="file modified" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
 {{- end }}
 {{ end }}
 <script>
-function load(tag1, tag2, file) {
+function load(tag1, tag2, file, oldFile) {
     window.parent.document.dispatchEvent(new CustomEvent('loadDiff', {
         detail: {
             tag1: tag1,
             tag2: tag2,
-            file: file
+            file: file,
+            oldFile: oldFile
         }
     }));
     // prevent default link behavior

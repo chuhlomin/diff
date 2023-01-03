@@ -24,7 +24,7 @@ require(['vs/editor/editor.main'], function () {
         }
     });
 
-    fetch(`/versions/?tag1={{ .Tag1 }}&tag2={{ .Tag2 }}&file={{ .File }}`)
+    fetch(`/versions/?tag1={{ .Tag1 }}&tag2={{ .Tag2 }}&file={{ .File }}{{ with .OldFile }}&oldfile={{ . }}{{ end }}`)
         .then(response => response.json())
         .then(json => {
             diffEditor.setModel({

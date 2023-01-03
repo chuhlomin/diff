@@ -35,7 +35,11 @@ function loadFiles() {
 }
 function loadDiff(customEvent) {
     var diff = document.getElementById('diff');
-    diff.src = '/diff?tag1=' + customEvent.detail.tag1 + '&tag2=' + customEvent.detail.tag2 + '&file=' + customEvent.detail.file;
+    var src = '/diff?tag1=' + customEvent.detail.tag1 + '&tag2=' + customEvent.detail.tag2 + '&file=' + customEvent.detail.file
+    if (customEvent.detail.oldFile !== undefined) {
+        src += '&oldFile=' + customEvent.detail.oldFile
+    }
+    diff.src = src;
 }
 window.document.addEventListener('loadDiff', loadDiff, false)
 </script>
