@@ -9,27 +9,34 @@
 <body>
 {{ range .Changes }}
 {{- if eq .ChangeType "R" }}
-<a class="file renamed" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}', '{{ .OldName }}')" data-file="{{ .OldName }} → {{ .Name }}" title="{{ .OldName }} → {{ .Name }}">{{ .OldName }} → {{ .Name }}</a>
+<a class="file renamed" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" data-oldname="{{ .OldName }}" title="{{ .OldName }} → {{ .Name }}">{{ .OldName }} → {{ .Name }}</a>
 {{- else if eq .ChangeType "D" }}
-<a class="file deleted" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
+<a class="file deleted" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
 {{- else if eq .ChangeType "A" }}
-<a class="file new" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
+<a class="file new" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
 {{- else }}
-<a class="file modified" onclick="load('{{ $.Tag1 }}', '{{ $.Tag2 }}', '{{ .Name }}')" data-file="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
+<a class="file modified" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
 {{- end }}
 {{ end }}
 <script>
-function load(tag1, tag2, file, oldFile) {
+function load(e) {
+    e.preventDefault();
+
+    // add .selected class to clicked element
+    var selected = document.querySelector('.selected');
+    if (selected) {
+        selected.classList.remove('selected');
+    }
+    e.target.classList.add('selected');
+
     window.parent.document.dispatchEvent(new CustomEvent('loadDiff', {
         detail: {
-            tag1: tag1,
-            tag2: tag2,
-            file: file,
-            oldFile: oldFile
+            tag1: e.target.dataset.tag1,
+            tag2: e.target.dataset.tag2,
+            file: e.target.dataset.name,
+            oldFile: e.target.dataset.oldname
         }
     }));
-    // prevent default link behavior
-    return false;
 }
 </script>
 </body>

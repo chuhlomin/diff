@@ -88,6 +88,10 @@ iframe + iframe {
   cursor: default;
 }
 
+.file.selected {
+  font-weight: bold;
+}
+
 .file.new {
   background-color: #e6ffed;
 }
