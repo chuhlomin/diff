@@ -8,6 +8,7 @@
 <script src="../../vs/loader.js"></script>
 </head>
 <body>
+<div class="loading">Loading...</div>
 <div class="diff"></div>
 <script>
 require.config({ paths: { vs: '../../vs' } });
@@ -24,9 +25,12 @@ require(['vs/editor/editor.main'], function () {
         }
     });
 
+    document.querySelector('.loading').style.display = 'block';
+
     fetch(`/versions/?tag1={{ .Tag1 }}&tag2={{ .Tag2 }}&file={{ .File }}{{ with .OldFile }}&oldfile={{ . }}{{ end }}`)
         .then(response => response.json())
         .then(json => {
+            document.querySelector('.loading').style.display = 'none';
             diffEditor.setModel({
                 original: monaco.editor.createModel(json.content1, 'php'),
                 modified: monaco.editor.createModel(json.content2, 'php')

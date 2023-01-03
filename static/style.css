@@ -119,3 +119,7 @@ iframe + iframe {
   bottom: 0;
   top: 0;
 }
+
+.loading {
+  padding: 20px;
+}
