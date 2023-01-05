@@ -1,0 +1,17 @@
+{
+	local_certs
+	auto_https disable_redirects
+	# debug
+}
+
+# Add to /etc/hosts so that Caddy can issue certificate locally
+# 127.0.0.1       diff.local.chuhlomin.com
+
+diff.local.chuhlomin.com {
+	tls internal
+
+	root * output
+	try_files {path}.html
+	encode gzip
+	file_server
+}

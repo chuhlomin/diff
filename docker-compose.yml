@@ -1,0 +1,9 @@
+version: '3.7'
+services:
+  server:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - 127.0.0.1:8080:80
+    volumes:
+      - ./output/:/usr/share/nginx/html/

@@ -3,8 +3,8 @@ module github.com/chuhlomin/comparison
 go 1.19
 
 require (
-	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-git/go-git/v5 v5.5.1
+	github.com/jessevdk/go-flags v1.5.0
 )
 
 require (

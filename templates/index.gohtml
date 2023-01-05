@@ -10,15 +10,15 @@
 <div class="container">
     <div class="tags">
         <select name="from" onchange="loadFiles()">
-        {{ range .Tags }}
-            <option>{{ . }}</option>
-        {{ end }}
+            {{ range .Tags -}}
+                <option>{{ .Name }}</option>
+            {{ end -}}
         </select>
         →
         <select name="to" onchange="loadFiles()">
-            {{ range .Tags }}
-                <option>{{ . }}</option>
-            {{ end }}
+            {{ range .Tags -}}
+                <option>{{ .Name }}</option>
+            {{ end -}}
         </select>
     </div>
     <div class="content">
@@ -31,11 +31,11 @@ function loadFiles() {
     var from = document.querySelector('select[name="from"]').value;
     var to = document.querySelector('select[name="to"]').value;
     var files = document.getElementById('files');
-    files.src = '/files/' + from + '/' + to;
+    files.src = '/files/' + from + '/' + to + '.html';
 }
 function loadDiff(customEvent) {
     var diff = document.getElementById('diff');
-    var src = '/diff?tag1=' + customEvent.detail.tag1 + '&tag2=' + customEvent.detail.tag2 + '&file=' + customEvent.detail.file
+    var src = '/diff.html?tag1=' + customEvent.detail.tag1 + '&tag2=' + customEvent.detail.tag2 + '&file=' + customEvent.detail.file
     if (customEvent.detail.oldFile !== undefined) {
         src += '&oldFile=' + customEvent.detail.oldFile
     }

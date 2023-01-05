@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
+{{ if not .Changes }}
+<p class="no-changes">No changes</p>
+{{ end }}
 {{ range .Changes }}
 {{- if eq .ChangeType "R" }}
 <a class="file renamed" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" data-oldname="{{ .OldName }}" title="{{ .OldName }} → {{ .Name }}">{{ .OldName }} → {{ .Name }}</a>
