@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -219,10 +218,6 @@ func (g *generator) renderFilesChangesForTags(tag1, tag2 tag, patches []patch) e
 	}
 
 	return nil
-}
-
-func (g *generator) handlerVersions(w http.ResponseWriter, r *http.Request) {
-
 }
 
 func (g *generator) pullFiles(tags []tag) error {
