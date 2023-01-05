@@ -76,6 +76,13 @@ require(['vs/editor/editor.main'], function () {
         var originalTxt = r[0].responseText;
         var modifiedTxt = r[1].responseText;
 
+        if (r[0].status == 404) {
+            originalTxt = "";
+        }
+        if (r[1].status == 404) {
+            modifiedTxt = "";
+        }
+
         document.querySelector('.loading').style.display = 'none';
         diffEditor.setModel({
             original: monaco.editor.createModel(originalTxt, 'php'),
