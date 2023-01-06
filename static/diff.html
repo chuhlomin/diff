@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diff</title>
 <link rel="stylesheet" href="../../style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
 </head>
 <body>
 <div class="loading">Loading...</div>
@@ -24,9 +24,7 @@ function xhr(url) {
                 }
 
                 if (req.readyState === 4) {
-                    if ((req.status >= 200 && req.status < 300) || req.status === 1223) {
-                        c(req);
-                    } else if (req.status == 404) {
+                    if ((req.status >= 200 && req.status < 300) || req.status == 404 || req.status === 1223) {
                         c(req);
                     } else {
                         e(req);
@@ -47,6 +45,7 @@ function xhr(url) {
     );
 }
 
+require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' }});
 require(['vs/editor/editor.main'], function () {
     var diffEditor = monaco.editor.createDiffEditor(document.querySelector('.diff'), {
         enableSplitViewResizing: false,
