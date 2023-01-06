@@ -40,13 +40,13 @@ func (g *generator) Run() error {
 	}
 
 	log.Printf("Getting diffs")
-	patches, err := getDiff(g.repo, tags)
+	forward, backward, err := getDiff(g.repo, tags)
 	if err != nil {
 		return fmt.Errorf("get renames: %w", err)
 	}
 
 	log.Printf("Rendering files changes")
-	if err := g.renderFilesChanges(tags, patches); err != nil {
+	if err := g.renderFilesChanges(tags, forward, backward); err != nil {
 		return fmt.Errorf("render files: %w", err)
 	}
 
@@ -91,10 +91,14 @@ func (f file) Less(other file) bool {
 	return f.Name < other.Name
 }
 
-func (g *generator) renderFilesChanges(tags []tag, patches []patch) error {
+func (g *generator) renderFilesChanges(tags []tag, forward, backward []patch) error {
 	// get all combinations of tags
 	for _, tag1 := range tags {
 		for _, tag2 := range tags {
+			patches := forward
+			if strings.Split(tag1.Name, "-")[0] < strings.Split(tag2.Name, "-")[0] {
+				patches = backward
+			}
 			if err := g.renderFilesChangesForTags(tag1, tag2, patches); err != nil {
 				return fmt.Errorf("render files for tags %s -> %s: %w", tag1.Name, tag2.Name, err)
 			}
@@ -360,14 +364,34 @@ type patch struct {
 	changes  []diff.FilePatch
 }
 
-func getDiff(r *git.Repository, tags []tag) ([]patch, error) {
-	var result []patch
-
+func getDiff(r *git.Repository, tags []tag) ([]patch, []patch, error) {
 	sort.Slice(tags, func(i, j int) bool {
 		// tag has a format "2.10-v3877"
 		// we want to sort by "v3877" part acsending
 		return strings.Split(tags[i].Name, "-")[1] < strings.Split(tags[j].Name, "-")[1]
 	})
+
+	forward, err := getPatches(r, tags)
+	if err != nil {
+		return nil, nil, fmt.Errorf("get forward patches: %w", err)
+	}
+
+	sort.Slice(tags, func(i, j int) bool {
+		// tag has a format "2.10-v3877"
+		// we want to sort by "v3877" part descending
+		return strings.Split(tags[i].Name, "-")[1] > strings.Split(tags[j].Name, "-")[1]
+	})
+
+	backward, err := getPatches(r, tags)
+	if err != nil {
+		return nil, nil, fmt.Errorf("get forward patches: %w", err)
+	}
+
+	return forward, backward, nil
+}
+
+func getPatches(r *git.Repository, tags []tag) ([]patch, error) {
+	var result []patch
 
 	var commitPrev *object.Commit
 	var tagPrev string
