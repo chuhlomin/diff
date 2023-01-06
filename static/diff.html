@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diff</title>
 <link rel="stylesheet" href="../../style.css">
-<script src="../../vs/loader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js"></script>
 </head>
 <body>
 <div class="loading">Loading...</div>
@@ -63,14 +63,14 @@ require(['vs/editor/editor.main'], function () {
 
     let params = new URLSearchParams(window.location.search);
 
-    modifiedPath = "/content/" + params.get('tag2') + "/" + params.get('file');
+    modifiedPath = "https://raw.githubusercontent.com/ilyabirman/Aegea-Comparisons/" + params.get('tag2') + "/" + params.get('file');
 
     originalFile = params.get('file');
     if (params.get('oldFile')) {
         originalFile = params.get('oldFile');
     }
 
-    originalPath = "/content/" + params.get('tag1') + "/" + originalFile;
+    originalPath = "https://raw.githubusercontent.com/ilyabirman/Aegea-Comparisons/" + params.get('tag1') + "/" + originalFile;
 
     Promise.all([xhr(originalPath), xhr(modifiedPath)]).then(function (r) {
         var originalTxt = r[0].responseText;

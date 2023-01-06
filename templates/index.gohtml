@@ -35,7 +35,7 @@ function loadFiles() {
 }
 function loadDiff(customEvent) {
     var diff = document.getElementById('diff');
-    var src = '/diff.html?tag1=' + customEvent.detail.tag1 + '&tag2=' + customEvent.detail.tag2 + '&file=' + customEvent.detail.file
+    var src = '/diff.html?tag1=' + customEvent.detail.tag1 + '&tag2=' + customEvent.detail.tag2 + '&file=' + customEvent.detail.file;
     if (customEvent.detail.oldFile !== undefined) {
         src += '&oldFile=' + customEvent.detail.oldFile
     }
