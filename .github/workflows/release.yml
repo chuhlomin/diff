@@ -1,9 +1,9 @@
-name: main
+name: release
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - v*
 
 jobs:
   main:
