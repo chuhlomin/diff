@@ -35,14 +35,23 @@ select {
   background-color: #fff;
 }
 
-iframe {
+#files,
+#diff {
   border: 1px solid #ccc;
 }
 
-iframe + iframe {
+#files + #diff {
   border-left: none;
 }
 
+#files {
+  flex-grow: 1;
+}
+
+#diff {
+  flex-grow: 7;
+  position: relative;
+}
 
 .container {
   display: flex;
@@ -58,14 +67,6 @@ iframe + iframe {
   flex-grow: 1;
   margin-top: 20px;
   align-items: stretch;
-}
-
-#files {
-  flex-grow: 1;
-}
-
-#diff {
-  flex-grow: 4;
 }
 
 .files {
@@ -124,6 +125,16 @@ iframe + iframe {
   top: 0;
 }
 
-.loading {
+#diff .loader {
+  position: absolute;
+  display: none;
   padding: 20px;
+}
+
+#diff.loading .diff {
+  display: none;
+}
+
+#diff.loading .loader {
+  display: block;
 }

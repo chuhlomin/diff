@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Comparison</title>
 <link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -23,10 +24,47 @@
     </div>
     <div class="content">
         <iframe id="files"></iframe>
-        <iframe id="diff"></iframe>
+        <div id="diff">
+            <div class="loader">Loading...</div>
+            <div class="diff"></div>
+        </div>
     </div>
 </div>
 <script>
+require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' }});
+
+function xhr(url) {
+    var req = null;
+    return new Promise(
+        function (c, e) {
+            req = new XMLHttpRequest();
+            req.onreadystatechange = function () {
+                if (req._canceled) {
+                    return;
+                }
+
+                if (req.readyState === 4) {
+                    if ((req.status >= 200 && req.status < 300) || req.status == 404 || req.status === 1223) {
+                        c(req);
+                    } else {
+                        e(req);
+                    }
+                    req.onreadystatechange = function () {};
+                }
+            };
+
+            req.open('GET', url, true);
+            req.responseType = '';
+
+            req.send(null);
+        },
+        function () {
+            req._canceled = true;
+            req.abort();
+        }
+    );
+}
+
 function loadFiles() {
     var from = document.querySelector('select[name="from"]').value;
     var to = document.querySelector('select[name="to"]').value;
@@ -34,14 +72,51 @@ function loadFiles() {
     files.src = '/files/' + from + '/' + to + '.html';
 }
 function loadDiff(customEvent) {
-    var diff = document.getElementById('diff');
-    var src = '/diff.html?tag1=' + customEvent.detail.tag1 + '&tag2=' + customEvent.detail.tag2 + '&file=' + customEvent.detail.file;
-    if (customEvent.detail.oldFile !== undefined) {
-        src += '&oldFile=' + customEvent.detail.oldFile
+    document.getElementById('diff').classList.add('loading');
+
+    originalFile = customEvent.detail.file;
+    if (customEvent.detail.oldFile) {
+        originalFile = customEvent.detail.oldFile;
     }
-    diff.src = src;
+
+    modifiedPath = "https://raw.githubusercontent.com/ilyabirman/Aegea-Comparisons/" + customEvent.detail.tag2 + "/" + customEvent.detail.file;
+    originalPath = "https://raw.githubusercontent.com/ilyabirman/Aegea-Comparisons/" + customEvent.detail.tag1 + "/" + originalFile;
+
+    Promise.all([xhr(originalPath), xhr(modifiedPath)]).then(function (r) {
+        var originalTxt = r[0].responseText;
+        var modifiedTxt = r[1].responseText;
+
+        if (r[0].status == 404) {
+            originalTxt = "";
+        }
+        if (r[1].status == 404) {
+            modifiedTxt = "";
+        }
+
+        diffEditor.setModel({
+            original: monaco.editor.createModel(originalTxt, 'php'),
+            modified: monaco.editor.createModel(modifiedTxt, 'php')
+        });
+        document.getElementById('diff').classList.remove('loading');
+    });
 }
 window.document.addEventListener('loadDiff', loadDiff, false)
+
+var diffEditor;
+
+require(['vs/editor/editor.main'], function () {
+    diffEditor = monaco.editor.createDiffEditor(document.querySelector('.diff'), {
+        enableSplitViewResizing: false,
+        renderSideBySide: true,
+        readOnly: true,
+        automaticLayout: true,
+        scrollBeyondLastLine: false,
+        minimap: {
+            enabled: false
+        }
+    });
+});
+
 </script>
 </body>
 </html>
