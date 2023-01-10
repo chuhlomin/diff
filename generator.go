@@ -166,6 +166,9 @@ func (g *generator) renderFilesChangesForTags(tag1, tag2 tag, patches []patch) e
 						ChangeType: "R",
 						OldName:    from.Path(),
 					}
+					if _, ok := changes[from.Path()]; ok {
+						delete(changes, from.Path())
+					}
 					continue
 				}
 
