@@ -1,9 +1,11 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"html/template"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,8 +19,9 @@ import (
 )
 
 type generator struct {
-	repo *git.Repository
-	tmpl *template.Template
+	repo      *git.Repository
+	tmpl      *template.Template
+	staticDir string
 
 	contents map[string]map[string]string // tag -> file -> content
 }
@@ -50,9 +53,16 @@ func (g *generator) Run() error {
 		return fmt.Errorf("render files: %w", err)
 	}
 
-	log.Printf("Copying static files")
-	if err := g.copyStaticFiles(); err != nil {
-		return fmt.Errorf("copy static files: %w", err)
+	if g.staticDir != "" {
+		log.Printf("Copying static files from %s", g.staticDir)
+		if err := g.copyStaticFiles(); err != nil {
+			return fmt.Errorf("copy static files: %w", err)
+		}
+	} else {
+		log.Printf("Copying embedded static files")
+		if err := g.copyEmbeddedStaticFiles(); err != nil {
+			return fmt.Errorf("copy embedded static files: %w", err)
+		}
 	}
 	return nil
 }
@@ -224,12 +234,49 @@ func (g *generator) renderFilesChangesForTags(tag1, tag2 tag, patches []patch) e
 
 func (g *generator) copyStaticFiles() error {
 	// copy all files from "static" to "output" directory
-	if err := filepath.Walk("static", func(path string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(g.staticDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("walk: %w", err)
 		}
 
 		if info.IsDir() {
+			return nil
+		}
+
+		relPath, err := filepath.Rel(g.staticDir, path)
+		if err != nil {
+			return fmt.Errorf("get relative path: %w", err)
+		}
+
+		outputPath := filepath.Join("output", relPath)
+
+		if err := os.MkdirAll(filepath.Dir(outputPath), 0755); err != nil {
+			return fmt.Errorf("create dir: %w", err)
+		}
+
+		if err := copyFile(path, outputPath); err != nil {
+			return fmt.Errorf("copy file: %w", err)
+		}
+
+		return nil
+	}); err != nil {
+		return fmt.Errorf("walk: %w", err)
+	}
+
+	return nil
+}
+
+//go:embed static
+var static embed.FS
+
+func (g *generator) copyEmbeddedStaticFiles() error {
+	// copy all files from static embed.FS to "output" directory
+	if err := fs.WalkDir(static, "static", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return fmt.Errorf("walk: %w", err)
+		}
+
+		if d.IsDir() {
 			return nil
 		}
 
@@ -244,8 +291,18 @@ func (g *generator) copyStaticFiles() error {
 			return fmt.Errorf("create dir: %w", err)
 		}
 
-		if err := copyFile(path, outputPath); err != nil {
-			return fmt.Errorf("copy file: %w", err)
+		f, err := static.Open(path)
+		if err != nil {
+			return fmt.Errorf("open file: %w", err)
+		}
+
+		out, err := os.Create(outputPath)
+		if err != nil {
+			return fmt.Errorf("create file: %w", err)
+		}
+
+		if _, err := io.Copy(out, f); err != nil {
+			return fmt.Errorf("copy: %w", err)
 		}
 
 		return nil
