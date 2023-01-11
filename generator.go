@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
@@ -101,7 +102,7 @@ func (g *generator) renderFilesChanges(tags []tag, forward, backward []patch) er
 	for _, tag1 := range tags {
 		for _, tag2 := range tags {
 			patches := forward
-			if strings.Split(tag1.Name, "-")[0] < strings.Split(tag2.Name, "-")[0] {
+			if tag1.Version() > tag2.Version() {
 				patches = backward
 			}
 			if err := g.renderFilesChangesForTags(tag1, tag2, patches); err != nil {
@@ -334,8 +335,32 @@ func copyFile(src, dst string) error {
 }
 
 type tag struct {
-	Name string
-	Hash plumbing.Hash
+	Name    string
+	Hash    plumbing.Hash
+	version int
+}
+
+func (t tag) Version() int {
+	if t.version != 0 {
+		return t.version
+	}
+
+	// tag has a format "2.10-v3877"
+	// we want to return "3877" part
+	parts := strings.Split(t.Name, "v")
+	if len(parts) != 2 {
+		log.Printf("tag %q has unexpected format", t.Name)
+		return 0
+	}
+
+	v, err := strconv.Atoi(parts[1])
+	if err != nil {
+		log.Printf("tag %q has unexpected format: %v", t.Name, err)
+		return 0
+	}
+
+	t.version = v
+	return v
 }
 
 func getTags(r *git.Repository) ([]tag, error) {
@@ -361,7 +386,7 @@ func getTags(r *git.Repository) ([]tag, error) {
 	sort.Slice(tags, func(i, j int) bool {
 		// tag has a format "2.10-v3877"
 		// we want to sort by "v3877" part descending
-		return strings.Split(tags[i].Name, "-")[1] > strings.Split(tags[j].Name, "-")[1]
+		return tags[i].Version() > tags[j].Version()
 	})
 
 	return tags, nil
@@ -377,9 +402,8 @@ type patch struct {
 
 func getDiff(r *git.Repository, tags []tag) ([]patch, []patch, error) {
 	sort.Slice(tags, func(i, j int) bool {
-		// tag has a format "2.10-v3877"
-		// we want to sort by "v3877" part acsending
-		return strings.Split(tags[i].Name, "-")[1] < strings.Split(tags[j].Name, "-")[1]
+		// sort acsending
+		return tags[i].Version() < tags[j].Version()
 	})
 
 	forward, err := getPatches(r, tags)
@@ -388,9 +412,8 @@ func getDiff(r *git.Repository, tags []tag) ([]patch, []patch, error) {
 	}
 
 	sort.Slice(tags, func(i, j int) bool {
-		// tag has a format "2.10-v3877"
-		// we want to sort by "v3877" part descending
-		return strings.Split(tags[i].Name, "-")[1] > strings.Split(tags[j].Name, "-")[1]
+		// sort descending
+		return tags[i].Version() > tags[j].Version()
 	})
 
 	backward, err := getPatches(r, tags)
