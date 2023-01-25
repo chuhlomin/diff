@@ -97,8 +97,16 @@ select {
   font-weight: bold;
 }
 
+.file:hover {
+  background-color: #f6f8fa;
+}
+
 .file.new {
-  background-color: #e6ffed;
+  background-color: #ebf1dc;
+}
+
+.file.new:hover {
+  background-color: #d6e3b9;
 }
 
 .file.deleted {
@@ -109,12 +117,8 @@ select {
   background-color: #e6f6ff;
 }
 
-.file:hover {
-  background-color: #f6f8fa;
-}
-
-.file.new:hover {
-  background-color: #c6e2d3;
+.file.renamed:hover {
+  background-color: #c6e6ff;
 }
 
 .diff {
