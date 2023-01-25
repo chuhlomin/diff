@@ -23,6 +23,7 @@ type generator struct {
 	repo      *git.Repository
 	tmpl      *template.Template
 	staticDir string
+	copyFiles bool
 
 	contents map[string]map[string]string // tag -> file -> content
 }
@@ -52,6 +53,13 @@ func (g *generator) Run() error {
 	log.Printf("Rendering files changes")
 	if err := g.renderFilesChanges(tags, forward, backward); err != nil {
 		return fmt.Errorf("render files: %w", err)
+	}
+
+	if g.copyFiles {
+		log.Printf("Pulling files")
+		if err := g.pullFiles(tags); err != nil {
+			return fmt.Errorf("pull files: %w", err)
+		}
 	}
 
 	if g.staticDir != "" {
@@ -228,6 +236,50 @@ func (g *generator) renderFilesChangesForTags(tag1, tag2 tag, patches []patch) e
 		Changes: changesList,
 	}); err != nil {
 		return fmt.Errorf("execute template: %w", err)
+	}
+
+	return nil
+}
+
+func (g *generator) pullFiles(tags []tag) error {
+	// get all files in the tag
+	for _, tag := range tags {
+		commit, err := g.repo.CommitObject(tag.Hash)
+		if err != nil {
+			return fmt.Errorf("get commit for tag %q: %w", tag, err)
+		}
+
+		tree, err := commit.Tree()
+		if err != nil {
+			return fmt.Errorf("get tree: %w", err)
+		}
+
+		err = tree.Files().ForEach(func(file *object.File) error {
+			content, err := file.Contents()
+			if err != nil {
+				return fmt.Errorf("get file content: %w", err)
+			}
+
+			filePath := filepath.Join("output", "content", tag.Name, file.Name)
+
+			if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+				return fmt.Errorf("create dir: %w", err)
+			}
+
+			f, err := os.Create(filePath)
+			if err != nil {
+				return fmt.Errorf("create file: %w", err)
+			}
+
+			if _, err := f.WriteString(content); err != nil {
+				return fmt.Errorf("write file: %w", err)
+			}
+
+			return nil
+		})
+		if err != nil {
+			return fmt.Errorf("iterate files: %w", err)
+		}
 	}
 
 	return nil
