@@ -11,11 +11,11 @@
 <p class="no-changes">No changes</p>
 {{ end }}
 {{ range .Changes }}
-{{- if eq .ChangeType "R" }}
+{{- if eq .Operation "R" }}
 <a class="file renamed" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" data-oldname="{{ .OldName }}" title="{{ .OldName }} → {{ .Name }}">{{ .OldName }} → {{ .Name }}</a>
-{{- else if eq .ChangeType "D" }}
-<a class="file deleted" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
-{{- else if eq .ChangeType "A" }}
+{{- else if eq .Operation "D" }}
+<a class="file deleted" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .OldName }}" title="{{ .OldName }}">{{ .OldName }}</a>
+{{- else if eq .Operation "A" }}
 <a class="file new" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
 {{- else }}
 <a class="file modified" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>

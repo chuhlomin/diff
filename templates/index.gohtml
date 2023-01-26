@@ -44,7 +44,9 @@ function xhr(url) {
                 }
 
                 if (req.readyState === 4) {
-                    if ((req.status >= 200 && req.status < 300) || req.status == 404 || req.status === 1223) {
+                    // expected response codes: 200, 201, 204, 404
+                    // 0 – when running locally
+                    if ((req.status >= 200 && req.status < 300) || req.status == 404 || req.status === 1223 || req.status === 0) {
                         c(req);
                     } else {
                         e(req);
@@ -69,7 +71,7 @@ function loadFiles() {
     var from = document.querySelector('select[name="from"]').value;
     var to = document.querySelector('select[name="to"]').value;
     var files = document.getElementById('files');
-    files.src = '/files/' + from + '/' + to + '.html';
+    files.src = './files/' + from + '/' + to + '.html';
 }
 function loadDiff(customEvent) {
     document.getElementById('diff').classList.add('loading');
@@ -79,8 +81,8 @@ function loadDiff(customEvent) {
         originalFile = customEvent.detail.oldFile;
     }
 
-    modifiedPath = "https://raw.githubusercontent.com/ilyabirman/Aegea-Comparisons/" + customEvent.detail.tag2 + "/" + customEvent.detail.file;
-    originalPath = "https://raw.githubusercontent.com/ilyabirman/Aegea-Comparisons/" + customEvent.detail.tag1 + "/" + originalFile;
+    modifiedPath = "./content/" + customEvent.detail.tag2 + "/" + customEvent.detail.file;
+    originalPath = "./content/" + customEvent.detail.tag1 + "/" + originalFile;
 
     Promise.all([xhr(originalPath), xhr(modifiedPath)]).then(function (r) {
         var originalTxt = r[0].responseText;
