@@ -71,7 +71,7 @@ function loadFiles() {
     var from = document.querySelector('select[name="from"]').value;
     var to = document.querySelector('select[name="to"]').value;
     var files = document.getElementById('files');
-    files.src = './files/' + from + '/' + to + '.html';
+    files.src = '{{ .DiffBaseURL }}' + from + '/' + to + '.html';
 }
 function loadDiff(customEvent) {
     document.getElementById('diff').classList.add('loading');
@@ -81,8 +81,8 @@ function loadDiff(customEvent) {
         originalFile = customEvent.detail.oldFile;
     }
 
-    modifiedPath = "./content/" + customEvent.detail.tag2 + "/" + customEvent.detail.file;
-    originalPath = "./content/" + customEvent.detail.tag1 + "/" + originalFile;
+    modifiedPath = "{{ .ContentBaseURL }}" + customEvent.detail.tag2 + "/" + customEvent.detail.file;
+    originalPath = "{{ .ContentBaseURL }}" + customEvent.detail.tag1 + "/" + originalFile;
 
     Promise.all([xhr(originalPath), xhr(modifiedPath)]).then(function (r) {
         var originalTxt = r[0].responseText;

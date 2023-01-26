@@ -11,6 +11,11 @@ clean:
 	@rm -r -f output
 
 .PHONY: build
-## build: build the project
+## build: build the binary
 build:
+	@go build -o diff
+
+.PHONY: run
+## run: build & run the binary
+run: build
 	@go run .

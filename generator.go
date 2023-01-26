@@ -19,10 +19,12 @@ import (
 )
 
 type generator struct {
-	repo      *git.Repository
-	tmpl      *template.Template
-	staticDir string
-	copyFiles bool
+	repo           *git.Repository
+	tmpl           *template.Template
+	staticDir      string
+	copyFiles      bool
+	diffBaseURL    string
+	contentBaseURL string
 
 	contents map[string]map[string]string // tag -> file -> content
 }
@@ -77,9 +79,13 @@ func (g *generator) renderIndex(tags []tag) error {
 	defer f.Close()
 
 	if err := g.tmpl.ExecuteTemplate(f, "index.gohtml", struct {
-		Tags []tag
+		Tags           []tag
+		DiffBaseURL    string
+		ContentBaseURL string
 	}{
-		Tags: tags,
+		Tags:           tags,
+		DiffBaseURL:    g.diffBaseURL,
+		ContentBaseURL: g.contentBaseURL,
 	}); err != nil {
 		return fmt.Errorf("execute template: %w", err)
 	}
