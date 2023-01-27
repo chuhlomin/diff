@@ -15,6 +15,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/format/diff"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
@@ -307,6 +308,12 @@ func (g *generator) diff(tag1, tag2 tag) ([]file, error) {
 			fromPath = from.Path()
 		}
 
+		if toPath == fromPath {
+			if !hasChanges(patch) {
+				continue
+			}
+		}
+
 		changes = append(changes, file{
 			Name:    toPath,
 			OldName: fromPath,
@@ -329,6 +336,15 @@ func (g *generator) diff(tag1, tag2 tag) ([]file, error) {
 	}
 
 	return changes, nil
+}
+
+func hasChanges(patch diff.FilePatch) bool {
+	for _, chunk := range patch.Chunks() {
+		if chunk.Type() != diff.Equal {
+			return true
+		}
+	}
+	return false
 }
 
 func copyFile(src, dst string) error {
