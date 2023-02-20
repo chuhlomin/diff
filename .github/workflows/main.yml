@@ -22,7 +22,8 @@ jobs:
 
       - name: Run
         run: |
-          ./diff --content-base-url="https://pub-811bbee4b6804f3f9b5cbe6f27bf40e9.r2.dev/"
+          sed -i 's|./content|https://pub-811bbee4b6804f3f9b5cbe6f27bf40e9.r2.dev|g' static/script.js
+          ./diff
           cp -r static/* output
 
       - name: Publish
