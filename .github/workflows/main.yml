@@ -21,7 +21,9 @@ jobs:
         run: make build
 
       - name: Run
-        run: ./diff --content-base-url="https://pub-811bbee4b6804f3f9b5cbe6f27bf40e9.r2.dev/"
+        run: |
+          ./diff --content-base-url="https://pub-811bbee4b6804f3f9b5cbe6f27bf40e9.r2.dev/"
+          cp -r static/* output
 
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
