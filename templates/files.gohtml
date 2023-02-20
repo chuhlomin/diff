@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Files</title>
 <link rel="stylesheet" href="../../style.css">
+<script src="../../load-diff.js"></script>
 </head>
 <body>
 {{ if not .Changes }}
 <p class="no-changes">No changes</p>
 {{ end }}
-{{ range .Changes }}
+{{- range .Changes }}
 {{- if eq .Operation "R" }}
 <a class="file renamed" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" data-oldname="{{ .OldName }}" title="{{ .OldName }} → {{ .Name }}">{{ .OldName }} → {{ .Name }}</a>
 {{- else if eq .Operation "D" }}
@@ -21,26 +22,5 @@
 <a class="file modified" onclick="load(event)" data-tag1="{{ $.Tag1 }}" data-tag2="{{ $.Tag2 }}" data-name="{{ .Name }}" title="{{ .Name }}">{{ .Name }}</a>
 {{- end }}
 {{ end }}
-<script>
-function load(e) {
-    e.preventDefault();
-
-    // add .selected class to clicked element
-    var selected = document.querySelector('.selected');
-    if (selected) {
-        selected.classList.remove('selected');
-    }
-    e.target.classList.add('selected');
-
-    window.parent.document.dispatchEvent(new CustomEvent('loadDiff', {
-        detail: {
-            tag1: e.target.dataset.tag1,
-            tag2: e.target.dataset.tag2,
-            file: e.target.dataset.name,
-            oldFile: e.target.dataset.oldname
-        }
-    }));
-}
-</script>
 </body>
 </html>

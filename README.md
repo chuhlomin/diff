@@ -38,14 +38,10 @@ Static files will be copied into the output directory.
 
 There are two Go Templates in the `templates` directory: `index.gohtml` and `files.gohtml`.
 
-`index.gohtml` is used to generate the index page.
-It has the following variables:
+`index.gohtml` template is used to generate the index page.
+It has `Tags` variable - list of tags in the repository
 
-* `DiffBaseURL` - base URL for diff links, default is `./files/`
-* `ContentBaseURL` - base URL for content links, default is `./content/`. Used to get the content of the file in the specific tag, e.g. `https://raw.githubusercontent.com/ilyabirman/Aegea-Comparisons/`.
-* `Tags` - list of tags in the repository
-
-`files.gohtml` is used to generate the list of changed files from tag to tag.
+`files.gohtml` template is used to generate the list of changed files from tag to tag.
 It has the following variables:
 
 * `Changes` - list of changes between tags

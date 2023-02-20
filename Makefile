@@ -18,4 +18,5 @@ build:
 .PHONY: run
 ## run: build & run the binary
 run: build
-	@go run .
+	@go run . --copy
+	@cp -r static/* output/

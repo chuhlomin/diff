@@ -16,12 +16,10 @@ import (
 var templates embed.FS
 
 type config struct {
-	RepoURL        string `env:"REPO_URL" long:"url" description:"URL of the repository to clone" default:"https://github.com/ilyabirman/Aegea-Comparisons"`
-	RepoPath       string `env:"REPO_PATH" long:"path" description:"Path to the repository to read"`
-	TemplatesDir   string `env:"TEMPLATES_DIR" long:"templates" description:"Directory with templates"`
-	CopyFiles      bool   `env:"COPY_FILES" long:"copy" description:"Copy files per each tag into the output directory"`
-	DiffBaseURL    string `env:"DIFF_BASE_URL" long:"diff-base-url" description:"Base URL for diff links" default:"./files/"`
-	ContentBaseURL string `env:"CONTENT_BASE_URL" long:"content-base-url" description:"Base URL for content links" default:"./content/"`
+	RepoURL      string `env:"REPO_URL" long:"url" description:"URL of the repository to clone" default:"https://github.com/ilyabirman/Aegea-Comparisons"`
+	RepoPath     string `env:"REPO_PATH" long:"path" description:"Path to the repository to read"`
+	TemplatesDir string `env:"TEMPLATES_DIR" long:"templates" description:"Directory with templates"`
+	CopyFiles    bool   `env:"COPY_FILES" long:"copy" description:"Copy files per each tag into the output directory"`
 }
 
 func main() {
@@ -60,11 +58,9 @@ func run() error {
 	}
 
 	g := generator{
-		repo:           repo,
-		tmpl:           tmpl,
-		copyFiles:      cfg.CopyFiles,
-		diffBaseURL:    cfg.DiffBaseURL,
-		contentBaseURL: cfg.ContentBaseURL,
+		repo:      repo,
+		tmpl:      tmpl,
+		copyFiles: cfg.CopyFiles,
 	}
 
 	if err = g.Run(); err != nil {
