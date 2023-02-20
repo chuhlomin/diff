@@ -19,7 +19,6 @@ type config struct {
 	RepoURL        string `env:"REPO_URL" long:"url" description:"URL of the repository to clone" default:"https://github.com/ilyabirman/Aegea-Comparisons"`
 	RepoPath       string `env:"REPO_PATH" long:"path" description:"Path to the repository to read"`
 	TemplatesDir   string `env:"TEMPLATES_DIR" long:"templates" description:"Directory with templates"`
-	StaticDir      string `env:"STATIC_DIR" long:"static" description:"Directory with static files"`
 	CopyFiles      bool   `env:"COPY_FILES" long:"copy" description:"Copy files per each tag into the output directory"`
 	DiffBaseURL    string `env:"DIFF_BASE_URL" long:"diff-base-url" description:"Base URL for diff links" default:"./files/"`
 	ContentBaseURL string `env:"CONTENT_BASE_URL" long:"content-base-url" description:"Base URL for content links" default:"./content/"`
@@ -63,7 +62,6 @@ func run() error {
 	g := generator{
 		repo:           repo,
 		tmpl:           tmpl,
-		staticDir:      cfg.StaticDir,
 		copyFiles:      cfg.CopyFiles,
 		diffBaseURL:    cfg.DiffBaseURL,
 		contentBaseURL: cfg.ContentBaseURL,
